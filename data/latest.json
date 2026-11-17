@@ -1,0 +1,84 @@
+{
+ "kurlar": {
+  "tarih": "16.11.2026",
+  "bulten": "2026/215",
+  "USD": {
+   "efektif_alis": 50.2684,
+   "efektif_satis": 50.4698
+  },
+  "EUR": {
+   "efektif_alis": 55.3593,
+   "efektif_satis": 55.5812
+  }
+ },
+ "hava": {
+  "İstanbul": {
+   "durum": "Gök gürültülü",
+   "max": 16.7,
+   "min": 12.6,
+   "yagis": 100
+  },
+  "Ankara": {
+   "durum": "Gök gürültülü",
+   "max": 12.9,
+   "min": 4.8,
+   "yagis": 75
+  },
+  "İzmir": {
+   "durum": "Kapalı",
+   "max": 21.0,
+   "min": 13.8,
+   "yagis": 5
+  },
+  "Bursa": {
+   "durum": "Gök gürültülü",
+   "max": 17.0,
+   "min": 9.2,
+   "yagis": 93
+  },
+  "Antalya": {
+   "durum": "Kapalı",
+   "max": 20.7,
+   "min": 14.8,
+   "yagis": 8
+  },
+  "Gaziantep": {
+   "durum": "Sağanak",
+   "max": 14.6,
+   "min": 9.5,
+   "yagis": 50
+  },
+  "Mersin": {
+   "durum": "Sağanak",
+   "max": 20.6,
+   "min": 15.1,
+   "yagis": 23
+  },
+  "Adana": {
+   "durum": "Gök gürültülü",
+   "max": 18.9,
+   "min": 14.4,
+   "yagis": 63
+  }
+ },
+ "resmi_gazete": {
+  "fihrist": "https://www.resmigazete.gov.tr/fihrist?tarih=2026-11-17",
+  "maddeler": [
+   {
+    "baslik": "–– Adli Tıp Kurumu Personeli Görevde Yükselme ve Unvan Değişikliği Yönetmeliğinde Değişiklik Yapılmasına Dair Yönetmelik",
+    "url": "https://www.resmigazete.gov.tr/eskiler/2026/11/20261117-1.htm"
+   },
+   {
+    "baslik": "–– İstanbul Üniversitesi Bitki ve Bitkisel Ürünler Uygulama ve Araştırma Merkezi Yönetmeliğinin Yürürlükten Kaldırılmasına Dair Yönetmelik",
+    "url": "https://www.resmigazete.gov.tr/eskiler/2026/11/20261117-2.htm"
+   },
+   {
+    "baslik": "–– Anayasa Mahkemesinin 16/7/2026 Tarihli ve E: 2025/144, K: 2026/164 Sayılı Kararı",
+    "url": "https://www.resmigazete.gov.tr/eskiler/2026/11/20261117-3.pdf"
+   }
+  ],
+  "pdf": "https://www.resmigazete.gov.tr/eskiler/2026/11/20261117.pdf"
+ },
+ "guncelleme": "2026-11-17T11:11+03:00",
+ "hatalar": {}
+}
