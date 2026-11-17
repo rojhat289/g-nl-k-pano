@@ -1,64 +1,64 @@
 {
  "kurlar": {
-  "tarih": "16.11.2026",
-  "bulten": "2026/215",
+  "tarih": "17.11.2026",
+  "bulten": "2026/216",
   "USD": {
-   "efektif_alis": 50.2684,
-   "efektif_satis": 50.4698
+   "efektif_alis": 50.294,
+   "efektif_satis": 50.4955
   },
   "EUR": {
-   "efektif_alis": 55.3593,
-   "efektif_satis": 55.5812
+   "efektif_alis": 55.3062,
+   "efektif_satis": 55.5278
   }
  },
  "hava": {
   "İstanbul": {
    "durum": "Gök gürültülü",
-   "max": 16.7,
+   "max": 16.5,
    "min": 12.6,
    "yagis": 100
   },
   "Ankara": {
    "durum": "Gök gürültülü",
-   "max": 12.9,
+   "max": 12.3,
    "min": 4.8,
-   "yagis": 75
+   "yagis": 90
   },
   "İzmir": {
    "durum": "Kapalı",
-   "max": 21.0,
+   "max": 21.1,
    "min": 13.8,
    "yagis": 5
   },
   "Bursa": {
    "durum": "Gök gürültülü",
-   "max": 17.0,
+   "max": 17.4,
    "min": 9.2,
-   "yagis": 93
+   "yagis": 100
   },
   "Antalya": {
    "durum": "Kapalı",
-   "max": 20.7,
-   "min": 14.8,
-   "yagis": 8
+   "max": 20.6,
+   "min": 15.1,
+   "yagis": 10
   },
   "Gaziantep": {
    "durum": "Sağanak",
    "max": 14.6,
    "min": 9.5,
-   "yagis": 50
+   "yagis": 55
   },
   "Mersin": {
-   "durum": "Sağanak",
-   "max": 20.6,
+   "durum": "Kapalı",
+   "max": 20.4,
    "min": 15.1,
    "yagis": 23
   },
   "Adana": {
    "durum": "Gök gürültülü",
-   "max": 18.9,
+   "max": 19.1,
    "min": 14.4,
-   "yagis": 63
+   "yagis": 68
   }
  },
  "resmi_gazete": {
@@ -79,6 +79,6 @@
   ],
   "pdf": "https://www.resmigazete.gov.tr/eskiler/2026/11/20261117.pdf"
  },
- "guncelleme": "2026-11-17T11:11+03:00",
+ "guncelleme": "2026-11-17T17:14+03:00",
  "hatalar": {}
 }
