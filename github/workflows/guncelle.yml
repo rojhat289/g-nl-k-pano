@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="tr">
+<head>"""Günlük Pano - veri toplayıcı.
+Her kaynak ayrı bir fonksiyondur. Biri bozulursa diğerleri çalışmaya devam eder.
+Yeni kaynak eklemek için: bir fonksiyon yaz, en alttaki KAYNAKLAR listesine ekle."""
+import csv, html, json, re, urllib.parse, urllib.request, urllib.robotparser
+import xml.etree.ElementTree as ET
+from datetime import datetime
+from pathlib import Path
+from zoneinfo import ZoneInfo
+
+SIMDI = datetime.now(ZoneInfo("Europe/Istanbul"))
+VERI = Path("data")
+LATEST, ARSIV = VERI / "latest.json", VERI / "archive.csv"
+UA = {"User-Agent": "gunluk-pano/1.0 (kisisel proje, gunde bir kez)"}
+
+ILLER = {  # il: (enlem, boylam)
+    "İstanbul": (41.01, 28.98), "Ankara": (39.93, 32.86), "İzmir": (38.42, 27.14),
+    "Bursa": (40.19, 29.06), "Antalya": (36.90, 30.69), "Gaziantep": (37.07, 37.38),
+    "Mersin": (36.80, 34.64), "Adana": (37.00, 35.32),
+}
+HAVA_KODU = {0: "Açık", 1: "Az bulutlu", 2: "Parçalı bulutlu", 3: "Kapalı", 45: "Sisli",
+             48: "Sisli", 51: "Çisenti", 53: "Çisenti", 55: "Çisenti", 61: "Hafif yağmur",
+             63: "Yağmurlu", 65: "Kuvvetli yağmur", 71: "Hafif kar", 73: "Karlı",
+             75: "Yoğun kar", 80: "Sağanak", 81: "Sağanak", 82: "Şiddetli sağanak",
+             95: "Gök gürültülü", 96: "Dolu ihtimali", 99: "Dolu ihtimali"}
+
+
+def get(url):
+    with urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=30) as r:
+        return r.read()
+
+
+def robots_izin(url):
+    """Siteye istek atmadan önce robots.txt'e bakar; yasaklıysa False döner."""
+    p = urllib.parse.urlparse(url)
+    rp = urllib.robotparser.RobotFileParser()
+    try:
+        rp.parse(get(f"{p.scheme}://{p.netloc}/robots.txt").decode("utf-8", "replace").splitlines())
+    except Exception:
+        return True  # robots.txt okunamadıysa kısıtlama yok sayılır
+    return rp.can_fetch(UA["User-Agent"], url)
+
+
+def kurlar():
+    """TCMB günlük XML'i. Efektif satış = BanknoteSelling alanı."""
+    kok = ET.fromstring(get("https://www.tcmb.gov.tr/kurlar/today.xml"))
+    cikti = {"tarih": kok.get("Tarih"), "bulten": kok.get("Bulten_No")}
+    for kod in ("USD", "EUR"):
+        c = kok.find(f"Currency[@Kod='{kod}']")
+        cikti[kod] = {"efektif_alis": float(c.findtext("BanknoteBuying")),
+                      "efektif_satis": float(c.findtext("BanknoteSelling"))}
+    return cikti
+
+
+def hava():
+    """Open-Meteo (anahtarsız, CC BY 4.0). Bugünün tahmini, her il için bir istek."""
+    cikti = {}
+    for il, (enlem, boylam) in ILLER.items():
+        sorgu = urllib.parse.urlencode({
+            "latitude": enlem, "longitude": boylam, "forecast_days": 1,
+            "timezone": "Europe/Istanbul",
+            "daily": "weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max"})
+        g = json.loads(get("https://api.open-meteo.com/v1/forecast?" + sorgu))["daily"]
+        kod = g["weather_code"][0]
+        cikti[il] = {"durum": HAVA_KODU.get(kod, f"Hava kodu {kod}"), "max": g["temperature_2m_max"][0],
+                     "min": g["temperature_2m_min"][0], "yagis": g["precipitation_probability_max"][0]}
+    return cikti
+
+
+def resmi_gazete():
+    """Günün fihristindeki madde bağlantılarını toplar (/eskiler/YYYY/AA/YYYYAAGG-N.htm|pdf)."""
+    gun = SIMDI.strftime("%Y%m%d")
+    fihrist = f"https://www.resmigazete.gov.tr/fihrist?tarih={SIMDI:%Y-%m-%d}"
+    cikti = {"fihrist": fihrist, "maddeler": [],
+             "pdf": f"https://www.resmigazete.gov.tr/eskiler/{SIMDI:%Y/%m}/{gun}.pdf"}
+    if not robots_izin(fihrist):
+        cikti["not"] = "Site otomatik okumaya izin vermiyor; yalnızca bağlantılar gösteriliyor."
+        return cikti
+    sayfa = get(fihrist).decode("utf-8", "replace")
+    desen = rf'<a[^>]+href="([^"]*eskiler/\d{{4}}/\d{{2}}/{gun}-\d+\.(?:htm|pdf))"[^>]*>(.*?)</a>'
+    gorulen = set()
+    for href, ic in re.findall(desen, sayfa, re.S):
+        baslik = " ".join(html.unescape(re.sub(r"<[^>]+>", " ", ic)).split())
+        url = urllib.parse.urljoin(fihrist, href)
+        if baslik and url not in gorulen:
+            gorulen.add(url)
+            cikti["maddeler"].append({"baslik": baslik, "url": url})
+    if not cikti["maddeler"]:
+        cikti["not"] = "Fihristte madde bağlantısı bulunamadı; sayfa farklı yapıda olabilir."
+    return cikti
+
+
+def arsivle(taze):
+    """Bugünün sayılarını archive.csv'ye yazar (aynı gün tekrar çalışırsa satırı günceller)."""
+    satir = {"tarih": SIMDI.strftime("%Y-%m-%d")}
+    if "kurlar" in taze:
+        for kod in ("USD", "EUR"):
+            satir[f"{kod}_efektif_satis"] = taze["kurlar"][kod]["efektif_satis"]
+    if "hava" in taze:
+        for il, h in taze["hava"].items():
+            satir[f"{il}_min"], satir[f"{il}_max"] = h["min"], h["max"]
+    if "resmi_gazete" in taze:
+        satir["resmi_gazete_madde"] = len(taze["resmi_gazete"]["maddeler"])
+    satirlar = {}
+    if ARSIV.exists():
+        with ARSIV.open(encoding="utf-8-sig") as f:
+            satirlar = {r["tarih"]: r for r in csv.DictReader(f)}
+    satirlar[satir["tarih"]] = {**satirlar.get(satir["tarih"], {}), **satir}  # aynı günün eski değerleri korunur
+    alanlar = list(dict.fromkeys(a for r in satirlar.values() for a in r))
+    with ARSIV.open("w", newline="", encoding="utf-8-sig") as f:  # utf-8-sig: Excel Türkçe karakterleri doğru açar
+        w = csv.DictWriter(f, fieldnames=alanlar, restval="")
+        w.writeheader()
+        w.writerows(satirlar.values())
+
+
+KAYNAKLAR = {"kurlar": kurlar, "hava": hava, "resmi_gazete": resmi_gazete}
+
+
+def main():
+    VERI.mkdir(exist_ok=True)
+    onceki = json.loads(LATEST.read_text(encoding="utf-8")) if LATEST.exists() else {}
+    taze, hatalar = {}, {}
+    for ad, fonksiyon in KAYNAKLAR.items():
+        try:
+            taze[ad] = fonksiyon()
+        except Exception as e:  # bir kaynak bozulsa da diğerleri devam eder
+            hatalar[ad] = f"{type(e).__name__}: {e}"
+            print("HATA:", ad, hatalar[ad])
+    veri = {ad: taze.get(ad) or onceki.get(ad) for ad in KAYNAKLAR}  # hata varsa son başarılı veri kalır
+    veri["guncelleme"] = SIMDI.isoformat(timespec="minutes")
+    veri["hatalar"] = hatalar
+    LATEST.write_text(json.dumps(veri, ensure_ascii=False, indent=1), encoding="utf-8")
+    arsivle(taze)
+    print("Bitti. Başarılı:", list(taze), "| Hatalı:", list(hatalar))
+
+
+if __name__ == "__main__":
+    main()
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Günlük Pano</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Literata:wght@400;600&family=Public+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--zemin:#e9eef1;--murekkep:#16212b;--soluk:#566673;--cizgi:#c5d0d7;--deniz:#1b6a8a;--uyari:#9a4a06;color-scheme:light dark}
+@media(prefers-color-scheme:dark){:root{--zemin:#10181e;--murekkep:#e4ebef;--soluk:#93a4b0;--cizgi:#2b3a45;--deniz:#6cb7d6;--uyari:#e0a35c}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--zemin);color:var(--murekkep);font:16px/1.55 "Public Sans",system-ui,sans-serif}
+main{max-width:1040px;margin:0 auto;padding:36px 20px 56px}
+h1,h2{font-family:Literata,Georgia,serif;font-weight:600;margin:0}
+h1{font-size:clamp(1.9rem,5vw,2.9rem);line-height:1.12}
+h2{font-size:1.3rem}
+.alt{color:var(--soluk);margin:8px 0 32px}
+.izgara{display:grid;gap:32px 40px}
+@media(min-width:840px){.izgara{grid-template-columns:5fr 6fr;align-items:start}}
+section{border-top:3px solid var(--deniz);padding-top:12px;margin-bottom:32px}
+.kaynak{color:var(--soluk);font-size:.85rem;margin:2px 0 12px}
+table{width:100%;border-collapse:collapse}
+th,td{padding:9px 0;border-bottom:1px solid var(--cizgi);text-align:left;font-weight:400}
+thead th{font-size:.85rem;color:var(--soluk)}
+tbody th{font-weight:600}
+.sayi{text-align:right;font-variant-numeric:tabular-nums}
+.aralik{display:flex;align-items:center;gap:8px}
+.iz{position:relative;flex:1;min-width:64px;height:6px;border-radius:3px;background:var(--cizgi)}
+.iz i{position:absolute;top:0;bottom:0;border-radius:3px;background:var(--deniz)}
+.n{width:2.7em;font-variant-numeric:tabular-nums}.n:first-child{text-align:right}
+ul{list-style:none;margin:0;padding:0;max-height:26rem;overflow:auto}
+li{padding:7px 0;border-bottom:1px solid var(--cizgi)}
+a{color:var(--deniz)}
+.uyari{color:var(--uyari);margin:0 0 10px}
+.alt-not{color:var(--soluk);font-size:.85rem;margin-top:8px}
+</style>
+</head>
+<body>
+<main>
+  <h1 id="tarih">Günlük Pano</h1>
+  <p class="alt" id="guncelleme">Veri yükleniyor…</p>
+  <div class="izgara">
+    <div>
+      <section><h2>Döviz</h2><div id="kur"></div></section>
+      <section><h2>Resmî Gazete</h2><div id="rg"></div></section>
+    </div>
+    <section><h2>Hava durumu</h2><div id="hava"></div></section>
+  </div>
+  <p class="alt-not">Kaynaklar: TCMB, Resmî Gazete, hava durumu için <a href="https://open-meteo.com/">Open-Meteo.com</a> (CC BY 4.0). Yakında: baraj doluluk, motorin, altın, KİK kararları.</p>
+</main>
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const sayi = x => Number(x).toLocaleString("tr-TR", {minimumFractionDigits: 4, maximumFractionDigits: 4});
+const bos = "<p class='kaynak'>Henüz veri yok.</p>";
+const uyari = (v, ad) => v.hatalar && v.hatalar[ad]
+  ? `<p class="uyari" title="${esc(v.hatalar[ad])}">Bu kaynak şu an okunamadı. Son başarılı veri gösteriliyor.</p>` : "";
+
+function kurHtml(k) {
+  if (!k) return bos;
+  const satir = (ad, c) => `<tr><th scope="row">${ad}</th><td class="sayi">${sayi(c.efektif_alis)} ₺</td><td class="sayi">${sayi(c.efektif_satis)} ₺</td></tr>`;
+  return `<table><thead><tr><th>Para birimi</th><th class="sayi">Efektif alış</th><th class="sayi">Efektif satış</th></tr></thead>
+    <tbody>${satir("Dolar", k.USD)}${satir("Euro", k.EUR)}</tbody></table>
+    <p class="kaynak">TCMB bülteni: ${esc(k.tarih)}, sayı ${esc(k.bulten)}. Hafta sonu ve tatilde son iş gününün kuru görünür.</p>`;
+}
+
+function havaHtml(h) {
+  if (!h) return bos;
+  const iller = Object.keys(h);
+  const alt = Math.min(...iller.map(i => h[i].min)), ust = Math.max(...iller.map(i => h[i].max));
+  const aralik = (ust - alt) || 1;
+  const satirlar = iller.map(i => {
+    const x = h[i], sol = (x.min - alt) / aralik * 100, genislik = Math.max((x.max - x.min) / aralik * 100, 4);
+    return `<tr><th scope="row">${esc(i)}</th><td>${esc(x.durum)}</td>
+      <td><div class="aralik"><span class="n">${Math.round(x.min)}°</span><span class="iz"><i style="left:${sol}%;width:${genislik}%"></i></span><span class="n">${Math.round(x.max)}°</span></div></td>
+      <td class="sayi">%${x.yagis ?? "–"}</td></tr>`;
+  }).join("");
+  return `<table><thead><tr><th>İl</th><th>Durum</th><th>En düşük ve en yüksek</th><th class="sayi">Yağış ihtimali</th></tr></thead><tbody>${satirlar}</tbody></table>
+    <p class="kaynak">Bugünün tahmini. Çubuklar tüm illerin ortak sıcaklık ölçeğindedir.</p>`;
+}
+
+function rgHtml(r) {
+  if (!r) return bos;
+  const liste = r.maddeler.length
+    ? `<ul>${r.maddeler.map(m => `<li><a href="${esc(m.url)}">${esc(m.baslik)}</a></li>`).join("")}</ul>` : "";
+  return `${r.not ? `<p class="kaynak">${esc(r.not)}</p>` : ""}${liste}
+    <p class="kaynak"><a href="${esc(r.fihrist)}">Günün fihristi</a> ve <a href="${esc(r.pdf)}">tam sayı (PDF)</a></p>`;
+}
+
+fetch("data/latest.json?t=" + Date.now()).then(r => r.json()).then(v => {
+  const g = new Date(v.guncelleme);
+  $("#tarih").textContent = g.toLocaleDateString("tr-TR", {dateStyle: "full"});
+  $("#guncelleme").textContent = "Son güncelleme " + g.toLocaleTimeString("tr-TR", {hour: "2-digit", minute: "2-digit"});
+  $("#kur").innerHTML = uyari(v, "kurlar") + kurHtml(v.kurlar);
+  $("#hava").innerHTML = uyari(v, "hava") + havaHtml(v.hava);
+  $("#rg").innerHTML = uyari(v, "resmi_gazete") + rgHtml(v.resmi_gazete);
+}).catch(() => {
+  $("#guncelleme").textContent = "Veri dosyası bulunamadı. GitHub'da Actions sekmesinden ilk güncellemeyi elle başlatın.";
+});
+</script>
+</body>
+</html>
