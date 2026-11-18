@@ -1,84 +1,96 @@
 {
  "kurlar": {
-  "tarih": "17.11.2026",
-  "bulten": "2026/216",
+  "tarih": "18.11.2026",
+  "bulten": "2026/217",
   "USD": {
-   "efektif_alis": 50.294,
-   "efektif_satis": 50.4955
+   "efektif_alis": 50.3184,
+   "efektif_satis": 50.52
   },
   "EUR": {
-   "efektif_alis": 55.3062,
-   "efektif_satis": 55.5278
+   "efektif_alis": 55.2064,
+   "efektif_satis": 55.4276
   }
  },
  "hava": {
   "İstanbul": {
-   "durum": "Gök gürültülü",
-   "max": 16.5,
-   "min": 12.6,
-   "yagis": 100
+   "durum": "Sağanak",
+   "max": 18.8,
+   "min": 15.5,
+   "yagis": 95
   },
   "Ankara": {
-   "durum": "Gök gürültülü",
-   "max": 12.3,
-   "min": 4.8,
-   "yagis": 90
+   "durum": "Hafif yağmur",
+   "max": 15.3,
+   "min": 8.6,
+   "yagis": 100
   },
   "İzmir": {
    "durum": "Kapalı",
-   "max": 21.1,
-   "min": 13.8,
-   "yagis": 5
+   "max": 22.3,
+   "min": 16.8,
+   "yagis": 3
   },
   "Bursa": {
-   "durum": "Gök gürültülü",
-   "max": 17.4,
-   "min": 9.2,
+   "durum": "Hafif yağmur",
+   "max": 20.9,
+   "min": 16.7,
    "yagis": 100
   },
   "Antalya": {
    "durum": "Kapalı",
-   "max": 20.6,
-   "min": 15.1,
-   "yagis": 10
+   "max": 20.2,
+   "min": 15.3,
+   "yagis": 33
   },
   "Gaziantep": {
-   "durum": "Sağanak",
-   "max": 14.6,
-   "min": 9.5,
-   "yagis": 55
+   "durum": "Gök gürültülü",
+   "max": 15.4,
+   "min": 8.5,
+   "yagis": 25
   },
   "Mersin": {
    "durum": "Kapalı",
-   "max": 20.4,
-   "min": 15.1,
-   "yagis": 23
+   "max": 20.8,
+   "min": 14.8,
+   "yagis": 13
   },
   "Adana": {
-   "durum": "Gök gürültülü",
-   "max": 19.1,
-   "min": 14.4,
-   "yagis": 68
+   "durum": "Sağanak",
+   "max": 20.1,
+   "min": 13.9,
+   "yagis": 65
   }
  },
  "resmi_gazete": {
-  "fihrist": "https://www.resmigazete.gov.tr/fihrist?tarih=2026-11-17",
+  "fihrist": "https://www.resmigazete.gov.tr/fihrist?tarih=2026-11-18",
   "maddeler": [
    {
-    "baslik": "–– Adli Tıp Kurumu Personeli Görevde Yükselme ve Unvan Değişikliği Yönetmeliğinde Değişiklik Yapılmasına Dair Yönetmelik",
-    "url": "https://www.resmigazete.gov.tr/eskiler/2026/11/20261117-1.htm"
+    "baslik": "–– Bazı Anlaşmaların Yürürlüğe Girdiği Tarihlerin Tespit Edilmesi Hakkında Karar (Karar Sayısı: 11992)",
+    "url": "https://www.resmigazete.gov.tr/eskiler/2026/11/20261118-1.pdf"
    },
    {
-    "baslik": "–– İstanbul Üniversitesi Bitki ve Bitkisel Ürünler Uygulama ve Araştırma Merkezi Yönetmeliğinin Yürürlükten Kaldırılmasına Dair Yönetmelik",
-    "url": "https://www.resmigazete.gov.tr/eskiler/2026/11/20261117-2.htm"
+    "baslik": "–– Osmaniye Zorkun Yaylası Yaban Hayatı Geliştirme Sahasının Sınırlarının Değiştirilmesi Hakkında Karar (Karar Sayısı: 11993)",
+    "url": "https://www.resmigazete.gov.tr/eskiler/2026/11/20261118-2.pdf"
    },
    {
-    "baslik": "–– Anayasa Mahkemesinin 16/7/2026 Tarihli ve E: 2025/144, K: 2026/164 Sayılı Kararı",
-    "url": "https://www.resmigazete.gov.tr/eskiler/2026/11/20261117-3.pdf"
+    "baslik": "–– Yabancı Yatırımcılara Düzenlenecek İkamet İzinlerine Dair Karar (Karar Sayısı: 11994)",
+    "url": "https://www.resmigazete.gov.tr/eskiler/2026/11/20261118-3.pdf"
+   },
+   {
+    "baslik": "–– Harran Üniversitesi Elektrikli Araç Eğitim Uygulama ve Araştırma Merkezi Yönetmeliği",
+    "url": "https://www.resmigazete.gov.tr/eskiler/2026/11/20261118-4.htm"
+   },
+   {
+    "baslik": "–– İthalatta Haksız Rekabetin Önlenmesine İlişkin Tebliğ (No: 2026/32)",
+    "url": "https://www.resmigazete.gov.tr/eskiler/2026/11/20261118-5.htm"
+   },
+   {
+    "baslik": "–– Bankacılık Düzenleme ve Denetleme Kurulunun 17/11/2026 Tarihli ve 11601 Sayılı Kararı",
+    "url": "https://www.resmigazete.gov.tr/eskiler/2026/11/20261118-6.pdf"
    }
   ],
-  "pdf": "https://www.resmigazete.gov.tr/eskiler/2026/11/20261117.pdf"
+  "pdf": "https://www.resmigazete.gov.tr/eskiler/2026/11/20261118.pdf"
  },
- "guncelleme": "2026-11-17T17:14+03:00",
+ "guncelleme": "2026-11-18T17:16+03:00",
  "hatalar": {}
 }
