@@ -1,14 +1,14 @@
 {
  "kurlar": {
-  "tarih": "24.11.2026",
-  "bulten": "2026/221",
+  "tarih": "25.11.2026",
+  "bulten": "2026/222",
   "USD": {
-   "efektif_alis": 50.5022,
-   "efektif_satis": 50.7046
+   "efektif_alis": 50.5177,
+   "efektif_satis": 50.7201
   },
   "EUR": {
-   "efektif_alis": 55.1804,
-   "efektif_satis": 55.4015
+   "efektif_alis": 55.2583,
+   "efektif_satis": 55.4798
   }
  },
  "hava": {
@@ -62,31 +62,25 @@
   }
  },
  "resmi_gazete": {
-  "fihrist": "https://www.resmigazete.gov.tr/fihrist?tarih=2026-11-24",
+  "fihrist": "https://www.resmigazete.gov.tr/fihrist?tarih=2026-11-25",
   "maddeler": [
    {
-    "baslik": "–– Recep Tayyip Erdoğan Üniversitesi Ön Lisans ve Lisans Eğitim-Öğretim ve Sınav Yönetmeliğinde Değişiklik Yapılmasına Dair Yönetmelik",
-    "url": "https://www.resmigazete.gov.tr/eskiler/2026/11/20261124-1.htm"
+    "baslik": "–– Cumhurbaşkanlığı Tarafından Yapılan Atamalar Hakkında Kararlar (Karar: 2026/398, 399)",
+    "url": "https://www.resmigazete.gov.tr/eskiler/2026/11/20261125-3.pdf"
    },
    {
-    "baslik": "–– Vergi Usul Kanunu Genel Tebliği (Sıra No: 509)’nde Değişiklik Yapılmasına Dair Tebliğ (Sıra No: 598)",
-    "url": "https://www.resmigazete.gov.tr/eskiler/2026/11/20261124-2.htm"
+    "baslik": "–– Atılım Üniversitesi Sürekli Eğitim Uygulama ve Araştırma Merkezi Yönetmeliği",
+    "url": "https://www.resmigazete.gov.tr/eskiler/2026/11/20261125-1.htm"
    },
    {
-    "baslik": "–– Vergi Usul Kanunu Genel Tebliği (Sıra No: 599)",
-    "url": "https://www.resmigazete.gov.tr/eskiler/2026/11/20261124-3.htm"
-   },
-   {
-    "baslik": "–– Hayvancılık Desteklemeleri Uygulama Tebliği (Tebliğ No: 2024/23)’nde Değişiklik Yapılmasına Dair Tebliğ (No: 2026/29)",
-    "url": "https://www.resmigazete.gov.tr/eskiler/2026/11/20261124-4.htm"
-   },
-   {
-    "baslik": "–– Danıştay Dördüncü Dairesine Ait Karar",
-    "url": "https://www.resmigazete.gov.tr/eskiler/2026/11/20261124-5.pdf"
+    "baslik": "–– Harran Üniversitesi Ortadoğu Araştırmaları Uygulama ve Araştırma Merkezi Yönetmeliği",
+    "url": "https://www.resmigazete.gov.tr/eskiler/2026/11/20261125-2.htm"
    }
   ],
-  "pdf": "https://www.resmigazete.gov.tr/eskiler/2026/11/20261124.pdf"
+  "pdf": "https://www.resmigazete.gov.tr/eskiler/2026/11/20261125.pdf"
  },
- "guncelleme": "2026-11-24T17:20+03:00",
- "hatalar": {}
+ "guncelleme": "2026-11-25T17:21+03:00",
+ "hatalar": {
+  "hava": "URLError: <urlopen error _ssl.c:994: The handshake operation timed out>"
+ }
 }
